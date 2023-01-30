@@ -32,8 +32,8 @@ El presente código despliega un servidor node.js/express sobre el que se busca 
 > - name: Nombre completo del personaje correspondiente al ID dado. 
 > - mass: Masa del personaje correspondiente al ID dado.
 > - height: Altura del personaje correspondiente al ID dado.
-> - homeworld_name: nombre del planeta natal del personaje correspondiente al ID dado.
-> - homeworld_id: Identificador del planeta natal del personaje correspondiente al ID dado.
+> - homeworldName: nombre del planeta natal del personaje correspondiente al ID dado.
+> - homeworldId: Identificador del planeta natal del personaje correspondiente al ID dado.
 >
 > En caso de que dichos datos no se encuentren disponibles en la BD, se habrá de consultar en la SWAPI (https://swapi.dev/) sobre el endpoint adecuado
 
@@ -64,3 +64,6 @@ El presente código despliega un servidor node.js/express sobre el que se busca 
 > - action: Endpoint al que se accede
 > - header: Headers de la llamada almacenados como una cadena de texto plana
 > - ip: Dirección IP desde donde se realiza la llamada
+
+
+Adicionalmente a estos endpoints, se requiere ampliar el paquete `People` con las clases y funciones que sean necesarias para cubrir el caso de que el formato del objeto retornado por la SWAPI sea en idioma Wookiee.
