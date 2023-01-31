@@ -20,7 +20,7 @@ for (const modelInit of models) {
 }
 
 Object.keys(db).forEach(modelName => {
-  if (db[modelName].associate) {
+   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
@@ -28,13 +28,20 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-
+/**
+ * Method that synchronizes the models with the database and creates or recreates the table if it already exists.
+ * @return {Promise<void>}
+ */
 const initDB = async () => {
   await db.swPeople.sync({ force: true });
   await db.swPlanet.sync({ force: true });
   await db.logging.sync({ force: true });
 }
 
+/**
+ * Method to add multiple records to the database.
+ * @return {Promise<void>}
+ */
 const populateDB = async () => {
   await db.swPlanet.bulkCreate([
     {
@@ -53,12 +60,21 @@ const populateDB = async () => {
   ]);
 }
 
+/**
+ * Method to delete the tables swPeople, swPlanet, logging.
+ * @return {Promise<void>}
+ */
 const deleteDB = async () => {
   await db.swPeople.drop();
   await db.swPlanet.drop();
   await db.logging.drop();
 }
 
+/**
+ * Method to make a general query to swPlanet, swPeople and receive a simple response,
+ * with { raw: true } as an option in the method.
+ * @return {Promise<void>}
+ */
 const watchDB = async () => {
   const planets = await db.swPlanet.findAll({
     raw: true,
