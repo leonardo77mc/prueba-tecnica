@@ -14,13 +14,8 @@ const loggingMiddleware = (db) =>
         try {
             registerLog('debug', `loggingMiddleware > info:
                     Origin record for the request ip:${ip}, headers:${headers}, originalUrl:${originalUrl}`);
-            const queryLogging = await db.logging.findOne({where: {ip}, raw: true});
             // Persist this info on DB
-            const logging = await db.logging.create({action: originalUrl, header: headers, ip});
-
-            if (queryLogging) {
-                logging.destroy();
-            }
+            await db.logging.create({action: originalUrl, header: headers, ip});
         } catch (e) {
             registerLog('error', `loggingMiddleware > error: ${e.message}`);
         }

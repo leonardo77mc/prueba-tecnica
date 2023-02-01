@@ -1,12 +1,9 @@
-const registerLog = require('../../commons/logHandling');
-
 const _isWookieeFormat = (req) => {
     if (req.query.format && req.query.format == 'wookiee') {
         return true;
     }
     return false;
 }
-
 
 /**
  * Method for containing the endpoint routes for Swapi.
@@ -21,39 +18,101 @@ const applySwapiEndpoints = (server, app) => {
     });
 
     server.get('/hfswapi/getPeople/:id', async (req, res) => {
+
+        const wookieeFormat = _isWookieeFormat(req);
         const id = Number(req.params['id']);
         let swPeople;
-        try {
-            swPeople = await app.db.swPeople.findByPk(id, {raw: true});
-            if (swPeople) {
-                registerLog('info', `applySwapiEndpoints > Ruta:${req.url} swPeople:${JSON.stringify(swPeople)}`);
-            }
-        } catch (e) {
-            registerLog('error', `applySwapiEndpoints > Ruta:${req.url} > ${e.message}`);
+
+        if (wookieeFormat) {
+            // No veo la propiedad homeworld_name o homeworldName y el id en people desde la api
+            swPeople = await app.swapiFunctions.genericRequest(
+                `https://swapi.dev/api/people/${id}/?format=wookiee`, 'GET', null, true);
+        } else {
+            swPeople = await app.swapiFunctions.genericRequestById(id, app,
+                'swPeople',
+                'applySwapiEndpoints',
+                req.url,
+                'name', 'mass', 'height', ['homeworld_name', 'homeworldName'], ['homeworld_id', 'homeworldId']);
         }
+
         res.status(200).json({swPeople});
     });
 
     server.get('/hfswapi/getPlanet/:id', async (req, res) => {
+
+        const wookieeFormat = _isWookieeFormat(req);
         const id = Number(req.params['id']);
         let swPlanet;
-        try {
-            swPlanet = await app.db.swPlanet.findByPk(id, {raw: true});
-            if (swPlanet) {
-                registerLog('info', `applySwapiEndpoints > Ruta:${req.url} swPeople:${JSON.stringify(swPlanet)}`);
-            }
-        } catch (e) {
-            registerLog('error', `applySwapiEndpoints > Ruta:${req.url} > ${e.message}`);
+
+        if (wookieeFormat) {
+            // No veo la propiedad el id en planets desde la api
+            swPlanet = await app.swapiFunctions.genericRequest(
+                `https://swapi.dev/api/planets/${id}/?format=wookiee`, 'GET', null, true);
+        } else {
+            swPlanet = await app.swapiFunctions.genericRequestById(id, app,
+                'swPlanet',
+                'applySwapiEndpoints',
+                req.url,
+                'name', 'gravity');
         }
         res.status(200).json({swPlanet});
     });
 
     server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res) => {
-        res.sendStatus(501);
+
+        const randomPeopleId = parseInt(Math.random() * (83 - 1) + 1);
+        const randomPlanetId = parseInt(Math.random() * (60 - 1) + 1);
+
+        try {
+            // example swapi
+            // const people = await app.swapiFunctions.genericRequest(`https://swapi.dev/api/people/${randomPeopleId}`, 'GET', null, true);
+
+            // example swapi
+            // const planet = await app.swapiFunctions.genericRequest(`https://swapi.dev/api/planet/${randomPlanetId}`, 'GET', null, true);
+
+            const people = await app.swapiFunctions.genericRequestById(randomPeopleId, app,
+                'swPeople',
+                'applySwapiEndpoints',
+                req.url,
+                'id', 'name', 'mass', 'height', ['homeworld_name', 'homeworldName'], ['homeworld_id', 'homeworldId']);
+
+            const planet = await app.swapiFunctions.genericRequestById(randomPlanetId, app,
+                'swPlanet',
+                'applySwapiEndpoints',
+                req.url,
+                'id', 'name', 'gravity');
+
+            if (people && planet) {
+
+                const commonPeople = new app.CommonPeople(
+                    people['id'],
+                    people['name'],
+                    people['mass'],
+                    people['height'],
+                    people['homeworldName'],
+                    people['homeworldId']);
+
+                commonPeople.getWeightOnPlanet(planet['id']);
+
+                if (/[a-zA-Z]/.test(planet['gravity'])) {
+                    planet['gravity'] = Number(planet['gravity'].replace(planet['gravity'].match(/\W[a-zA-Z]+/), ''));
+                } else {
+                    planet['gravity'] = Number(planet['gravity']);
+                }
+
+                res.status(200).json({
+                    pesoPersonaje: app.swapiFunctions.getWeightOnPlanet(people['mass'], planet['gravity'])
+                });
+            }
+        } catch (e) {
+            res.status(201).json({message: e.message});
+        }
     });
 
     server.get('/hfswapi/getLogs', async (req, res) => {
-        const data = await app.db.logging.findAll();
+        const data = await app.db.logging.findAll({
+            attributes: ['action', 'header', 'ip']
+        });
         res.send(data);
     });
 
