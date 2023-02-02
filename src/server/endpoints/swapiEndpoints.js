@@ -60,8 +60,10 @@ const applySwapiEndpoints = (server, app) => {
 
     server.get('/hfswapi/getWeightOnPlanetRandom', async (req, res) => {
 
-        const randomPeopleId = parseInt(Math.random() * (83 - 1) + 1);
-        const randomPlanetId = parseInt(Math.random() * (60 - 1) + 1);
+        /** Esta prueba funciona correcto con 10 registros locales, para una prueba con la api de
+         * swapi es necesario el id en los request */
+        const randomPeopleId = parseInt(Math.random() * (10 - 1) + 1);
+        const randomPlanetId = parseInt(Math.random() * (10 - 1) + 1);
 
         try {
             // example swapi
@@ -84,13 +86,15 @@ const applySwapiEndpoints = (server, app) => {
 
             if (people && planet) {
 
-                const commonPeople = new app.CommonPeople(
-                    people['id'],
-                    people['name'],
-                    people['mass'],
-                    people['height'],
-                    people['homeworldName'],
-                    people['homeworldId']);
+                const commonPeople = new app.CommonPeople([
+                    {property: 'id', value: people['id']},
+                    {property: 'name', value: people['name']},
+                    {property: 'mass', value: people['mass']},
+                    {property: 'height', value: people['height']},
+                    {property: 'homeworldName', value: people['homeworldName']},
+                    {property: 'homeworldId', value: people['homeworldId']}]);
+
+                commonPeople.init();
 
                 commonPeople.getWeightOnPlanet(planet['id']);
 

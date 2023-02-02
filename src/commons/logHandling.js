@@ -3,7 +3,7 @@ const log4js = require('log4js');
 const logger = log4js.getLogger();
 
 /**
- * Metodo para registrar un log de acuerdo al nivel debug, error, trace o info.
+ * Method to register a log according to the debug, error, trace or info level.
  * @param {string} level
  * @param {string} message
  */

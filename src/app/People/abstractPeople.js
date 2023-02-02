@@ -1,14 +1,14 @@
 class AbstractPeople {
 
-    constructor(...values) {
+    constructor(values) {
         if (this.constructor == AbstractPeople) {
             throw new Error("Abstract classes can't be instantiated.");
         }
         this.propertiesList = values;
     }
 
-    async init(){
-        if(this.propertiesList.length > 0) {
+    async init() {
+        if (this.propertiesList.length > 0) {
             this.propertiesList.forEach(v => {
                 this[v['property']] = v['value'];
             })
@@ -16,7 +16,7 @@ class AbstractPeople {
     }
 
     getId() {
-       return this.id;
+        return this.id;
     }
 
     getName() {
@@ -36,17 +36,18 @@ class AbstractPeople {
     }
 
     getHomeworlId() {
-        return this.homeworlId;
+        return this.homeworldId;
     }
 
-    getWeightOnPlanet(planetId){
+    getWeightOnPlanet(planetId) {
         const nativePlanetId = this.getHomeworlId().replace(this.getHomeworlId(), this.getHomeworlId().match(/\d+/));
-        if(planetId === parseInt(nativePlanetId)) throw new Error('you are trying to calculate the weight of a character on his home planet');
-
+        if (planetId === parseInt(nativePlanetId)) {
+            throw new Error('you are trying to calculate the weight of a character on his home planet');
+        }
     }
 
-    getWhrascwo () {
-       return this.whrascwo;
+    getWhrascwo() {
+        return this.whrascwo;
     }
 
     getAcwoahrracao() {
